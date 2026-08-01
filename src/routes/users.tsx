@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Mail, MapPin, Phone, Ruler, Search, ShieldAlert, X } from "lucide-react";
+import { ArrowUpRight, Mail, MapPin, Phone, Ruler, Search, ShieldAlert, X } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { StatusPill } from "@/components/admin/StatusPill";
 import { users, type AdminUser, type UserRole } from "@/lib/admin-data";
+import { designerProfiles } from "@/lib/designer-data";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/users")({
@@ -31,6 +32,7 @@ function UsersPage() {
   const [status, setStatus] = useState("all");
   const [plan, setPlan] = useState("all");
   const [selectedId, setSelectedId] = useState<string | null>(users[0]?.id ?? null);
+  const navigate = useNavigate();
 
   const filtered = useMemo(
     () =>
@@ -49,7 +51,18 @@ function UsersPage() {
   const counts = (id: UserRole | "all") => (id === "all" ? users.length : users.filter((u) => u.role === id).length);
 
   return (
-    <AdminShell title="Users" subtitle="Designers, clients and workers across the platform">
+    <AdminShell
+      title="Users"
+      subtitle="Designers, clients and workers across the platform"
+      actions={
+        <Link
+          to="/approvals"
+          className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+        >
+          Pending approvals
+        </Link>
+      }
+    >
       {/* Filter bar */}
       <div className="solid-card flex flex-wrap items-center gap-3 p-3">
         <div className="flex rounded-xl bg-muted p-1">
@@ -121,33 +134,37 @@ function UsersPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((u) => (
-                  <tr
-                    key={u.id}
-                    onClick={() => setSelectedId(u.id)}
-                    className={cn(
-                      "cursor-pointer border-t border-border transition-colors",
-                      selectedId === u.id ? "bg-primary/8" : "hover:bg-muted/70",
-                    )}
-                  >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent/20 text-xs font-semibold text-primary">
-                          {u.initials}
-                        </span>
-                        <div className="min-w-0">
-                          <p className="truncate font-medium">{u.name}</p>
-                          <p className="num truncate text-xs text-muted-foreground">{u.id} · {u.role}</p>
+                {filtered.map((u) => {
+                  const hasProfile = Boolean(designerProfiles[u.id]);
+                  return (
+                    <tr
+                      key={u.id}
+                      onClick={() => setSelectedId(u.id)}
+                      onDoubleClick={() => hasProfile && navigate({ to: "/designers/$id", params: { id: u.id } })}
+                      className={cn(
+                        "cursor-pointer border-t border-border transition-colors",
+                        selectedId === u.id ? "bg-primary/8" : "hover:bg-muted/70",
+                      )}
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent/20 text-xs font-semibold text-primary">
+                            {u.initials}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="truncate font-medium">{u.name}</p>
+                            <p className="num truncate text-xs text-muted-foreground">{u.id} · {u.role}</p>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="num px-4 py-3 whitespace-nowrap text-muted-foreground">{u.phone}</td>
-                    <td className="px-4 py-3"><StatusPill value={u.plan} /></td>
-                    <td className="px-4 py-3"><StatusPill value={u.status} /></td>
-                    <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{u.lastActive}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{u.signupDate}</td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="num px-4 py-3 whitespace-nowrap text-muted-foreground">{u.phone}</td>
+                      <td className="px-4 py-3"><StatusPill value={u.plan} /></td>
+                      <td className="px-4 py-3"><StatusPill value={u.status} /></td>
+                      <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{u.lastActive}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">{u.signupDate}</td>
+                    </tr>
+                  );
+                })}
                 {filtered.length === 0 && (
                   <tr>
                     <td colSpan={6} className="px-4 py-14 text-center text-muted-foreground">
@@ -178,6 +195,8 @@ function DetailPanel({ user, onClose }: { user: AdminUser | null; onClose: () =>
     );
   }
 
+  const hasProfile = Boolean(designerProfiles[user.id]);
+
   return (
     <aside className="glass-panel sticky top-24 h-fit max-h-[calc(100vh-8rem)] overflow-auto p-5">
       <div className="flex items-start gap-3">
@@ -202,6 +221,17 @@ function DetailPanel({ user, onClose }: { user: AdminUser | null; onClose: () =>
           <X className="size-4" strokeWidth={1.75} />
         </button>
       </div>
+
+      {hasProfile && (
+        <Link
+          to="/designers/$id"
+          params={{ id: user.id }}
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+        >
+          Open full designer profile
+          <ArrowUpRight className="size-4" strokeWidth={2} />
+        </Link>
+      )}
 
       <dl className="mt-5 space-y-2 text-sm">
         <Row icon={Phone} value={user.phone} />
@@ -266,7 +296,7 @@ function DetailPanel({ user, onClose }: { user: AdminUser | null; onClose: () =>
       <div className="mt-5 flex gap-2">
         <button
           type="button"
-          className="flex-1 rounded-xl bg-primary px-3 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+          className="flex-1 rounded-xl bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-muted"
         >
           Message user
         </button>
