@@ -30,7 +30,7 @@ function UsersPage() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
   const [plan, setPlan] = useState("all");
-  const [selectedId, setSelectedId] = useState<string | null>(users[0].id);
+  const [selectedId, setSelectedId] = useState<string | null>(users[0]?.id ?? null);
 
   const filtered = useMemo(
     () =>
