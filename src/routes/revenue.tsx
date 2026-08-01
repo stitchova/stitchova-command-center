@@ -40,7 +40,7 @@ function RevenuePage() {
                 cursor={{ fill: "var(--muted)" }}
                 contentStyle={{ borderRadius: 12, border: "1px solid var(--border)", background: "var(--card)", fontSize: 12 }}
               />
-              <Bar dataKey="revenue" fill="var(--chart-1)" radius={[8, 8, 0, 0]} maxBarSize={44} />
+              <Bar dataKey="revenue" isAnimationActive={false} fill="var(--chart-1)" radius={[8, 8, 0, 0]} maxBarSize={44} />
             </BarChart>
           </ResponsiveContainer>
         </div>

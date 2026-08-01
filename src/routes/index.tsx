@@ -91,8 +91,8 @@ function Overview() {
                     fontSize: 12,
                   }}
                 />
-                <Area type="monotone" dataKey="clients" stroke="var(--chart-3)" strokeWidth={2} fill="url(#gClients)" />
-                <Area type="monotone" dataKey="designers" stroke="var(--chart-1)" strokeWidth={2} fill="url(#gDesigners)" />
+                <Area type="monotone" dataKey="clients" isAnimationActive={false} stroke="var(--chart-3)" strokeWidth={2} fill="url(#gClients)" />
+                <Area type="monotone" dataKey="designers" isAnimationActive={false} stroke="var(--chart-1)" strokeWidth={2} fill="url(#gDesigners)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
