@@ -40,7 +40,7 @@ export const Route = createFileRoute("/designers/$id")({
 });
 
 function DesignerDetail() {
-  const { designer } = Route.useLoaderData();
+  const { designer } = Route.useLoaderData() as { designer: DesignerProfile };
   const [plan, setPlan] = useState(designer.plan);
   const [status, setStatus] = useState(designer.status);
   const [notes, setNotes] = useState(designer.notes);
