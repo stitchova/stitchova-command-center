@@ -10,15 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApprovalsRouteImport } from './routes/approvals'
 import { Route as ContentRouteImport } from './routes/content'
 import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as RevenueRouteImport } from './routes/revenue'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as UsersRouteImport } from './routes/users'
+import { Route as DesignersIdRouteImport } from './routes/designers.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApprovalsRoute = ApprovalsRouteImport.update({
+  id: '/approvals',
+  path: '/approvals',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContentRoute = ContentRouteImport.update({
@@ -46,54 +53,85 @@ const UsersRoute = UsersRouteImport.update({
   path: '/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DesignersIdRoute = DesignersIdRouteImport.update({
+  id: '/designers/$id',
+  path: '/designers/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/approvals': typeof ApprovalsRoute
   '/content': typeof ContentRoute
   '/orders': typeof OrdersRoute
   '/revenue': typeof RevenueRoute
   '/support': typeof SupportRoute
   '/users': typeof UsersRoute
+  '/designers/$id': typeof DesignersIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/approvals': typeof ApprovalsRoute
   '/content': typeof ContentRoute
   '/orders': typeof OrdersRoute
   '/revenue': typeof RevenueRoute
   '/support': typeof SupportRoute
   '/users': typeof UsersRoute
+  '/designers/$id': typeof DesignersIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/approvals': typeof ApprovalsRoute
   '/content': typeof ContentRoute
   '/orders': typeof OrdersRoute
   '/revenue': typeof RevenueRoute
   '/support': typeof SupportRoute
   '/users': typeof UsersRoute
+  '/designers/$id': typeof DesignersIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/content' | '/orders' | '/revenue' | '/support' | '/users'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/content' | '/orders' | '/revenue' | '/support' | '/users'
-  id:
-    | '__root__'
+  fullPaths:
     | '/'
+    | '/approvals'
     | '/content'
     | '/orders'
     | '/revenue'
     | '/support'
     | '/users'
+    | '/designers/$id'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/approvals'
+    | '/content'
+    | '/orders'
+    | '/revenue'
+    | '/support'
+    | '/users'
+    | '/designers/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/approvals'
+    | '/content'
+    | '/orders'
+    | '/revenue'
+    | '/support'
+    | '/users'
+    | '/designers/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApprovalsRoute: typeof ApprovalsRoute
   ContentRoute: typeof ContentRoute
   OrdersRoute: typeof OrdersRoute
   RevenueRoute: typeof RevenueRoute
   SupportRoute: typeof SupportRoute
   UsersRoute: typeof UsersRoute
+  DesignersIdRoute: typeof DesignersIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -103,6 +141,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/approvals': {
+      id: '/approvals'
+      path: '/approvals'
+      fullPath: '/approvals'
+      preLoaderRoute: typeof ApprovalsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/content': {
@@ -140,16 +185,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/designers/$id': {
+      id: '/designers/$id'
+      path: '/designers/$id'
+      fullPath: '/designers/$id'
+      preLoaderRoute: typeof DesignersIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApprovalsRoute: ApprovalsRoute,
   ContentRoute: ContentRoute,
   OrdersRoute: OrdersRoute,
   RevenueRoute: RevenueRoute,
   SupportRoute: SupportRoute,
   UsersRoute: UsersRoute,
+  DesignersIdRoute: DesignersIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

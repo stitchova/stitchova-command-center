@@ -1,6 +1,8 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import {
+  ArrowLeft,
   Bell,
+  CalendarDays,
   CreditCard,
   LayoutDashboard,
   LifeBuoy,
@@ -9,6 +11,8 @@ import {
   Scissors,
   Search,
   Settings,
+  SlidersHorizontal,
+  UserCheck,
   Users,
 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -17,41 +21,44 @@ import { cn } from "@/lib/utils";
 const nav = [
   { to: "/", label: "Overview", icon: LayoutDashboard },
   { to: "/users", label: "Users", icon: Users },
+  { to: "/approvals", label: "Approvals", icon: UserCheck },
   { to: "/revenue", label: "Revenue", icon: CreditCard },
   { to: "/orders", label: "Orders", icon: Package },
-  { to: "/content", label: "Content Control", icon: Megaphone },
-  { to: "/support", label: "Support Tools", icon: LifeBuoy },
+  { to: "/content", label: "Content", icon: Megaphone },
+  { to: "/support", label: "Support", icon: LifeBuoy },
 ] as const;
 
 export function AdminShell({
   title,
   subtitle,
   actions,
+  back,
   children,
 }: {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  back?: boolean;
   children: ReactNode;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const router = useRouter();
 
   return (
     <div className="admin-canvas min-h-screen">
-      <div className="flex min-h-screen">
-        {/* Sidebar — solid for legibility */}
-        <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
-          <div className="flex items-center gap-2.5 px-5 py-5">
+      <header className="sticky top-0 z-40 px-4 pt-4">
+        <div className="glass-bar mx-auto flex max-w-[1500px] items-center gap-3 px-3 py-2.5">
+          <Link to="/" className="flex shrink-0 items-center gap-2.5 pr-1 pl-1.5">
             <span className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground">
               <Scissors className="size-4.5" strokeWidth={2} />
             </span>
-            <div className="leading-tight">
-              <p className="text-sm font-semibold tracking-tight">Stitchova</p>
-              <p className="text-[11px] text-muted-foreground">Admin Console</p>
-            </div>
-          </div>
+            <span className="hidden leading-tight sm:block">
+              <span className="block text-sm font-semibold tracking-tight">Stitchova</span>
+              <span className="block text-[11px] text-muted-foreground">Admin Console</span>
+            </span>
+          </Link>
 
-          <nav className="flex-1 space-y-1 px-3 py-2">
+          <nav className="mx-auto flex min-w-0 items-center gap-1 overflow-x-auto rounded-full bg-panel p-1 text-panel-foreground">
             {nav.map((item) => {
               const active = item.to === "/" ? pathname === "/" : pathname.startsWith(item.to);
               return (
@@ -59,74 +66,77 @@ export function AdminShell({
                   key={item.to}
                   to={item.to}
                   className={cn(
-                    "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+                    "flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium whitespace-nowrap transition-colors",
                     active
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground",
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-panel-muted hover:text-panel-foreground",
                   )}
                 >
-                  <item.icon className="size-4.5 shrink-0" strokeWidth={1.75} />
+                  <item.icon className="size-3.5" strokeWidth={2} />
                   {item.label}
-                  {active && <span className="ml-auto h-4 w-1 rounded-full bg-primary" />}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="border-t border-sidebar-border p-3">
-            <div className="flex items-center gap-3 rounded-xl px-2 py-2">
-              <span className="grid size-9 place-items-center rounded-full bg-accent/20 text-sm font-semibold text-primary">
-                JA
-              </span>
-              <div className="min-w-0 leading-tight">
-                <p className="truncate text-sm font-medium">John Amissah</p>
-                <p className="truncate text-[11px] text-muted-foreground">Founder · Owner</p>
-              </div>
-              <Settings className="ml-auto size-4 text-muted-foreground" strokeWidth={1.75} />
-            </div>
+          <div className="ml-auto flex shrink-0 items-center gap-1.5">
+            <IconButton label="Search"><Search className="size-4.5" strokeWidth={1.75} /></IconButton>
+            <IconButton label="Calendar"><CalendarDays className="size-4.5" strokeWidth={1.75} /></IconButton>
+            <IconButton label="Settings"><Settings className="size-4.5" strokeWidth={1.75} /></IconButton>
+            <IconButton label="Notifications">
+              <Bell className="size-4.5" strokeWidth={1.75} />
+              <span className="absolute top-2 right-2.5 size-1.5 rounded-full bg-destructive" />
+            </IconButton>
+            <span className="ml-1 grid size-9 shrink-0 place-items-center rounded-full bg-accent/25 text-xs font-semibold text-primary">
+              JA
+            </span>
           </div>
-        </aside>
+        </div>
+      </header>
 
-        <div className="flex min-w-0 flex-1 flex-col">
-          {/* Glass top bar */}
-          <header className="glass-nav sticky top-0 z-30">
-            <div className="flex items-center gap-4 px-6 py-4">
-              <div className="min-w-0">
-                <h1 className="truncate text-xl font-semibold tracking-tight">{title}</h1>
-                {subtitle && <p className="truncate text-sm text-muted-foreground">{subtitle}</p>}
-              </div>
-
-              <div className="ml-auto hidden items-center md:flex">
-                <div className="relative">
-                  <Search
-                    className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-                    strokeWidth={1.75}
-                  />
-                  <input
-                    type="search"
-                    placeholder="Search users, orders…"
-                    aria-label="Global search"
-                    className="h-9 w-64 rounded-xl border border-border bg-card pl-9 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring/40"
-                  />
-                </div>
-              </div>
-
+      <main className="mx-auto max-w-[1500px] px-4 pt-6 pb-12">
+        <div className="mb-5 flex flex-wrap items-start gap-4">
+          {back && (
+            <button
+              type="button"
+              onClick={() => router.history.back()}
+              aria-label="Go back"
+              className="mt-1.5 grid size-10 shrink-0 place-items-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ArrowLeft className="size-4.5" strokeWidth={1.75} />
+            </button>
+          )}
+          <div className="min-w-0">
+            <h1 className="truncate text-3xl font-semibold tracking-tight">{title}</h1>
+            {subtitle && <p className="mt-1 truncate text-sm text-muted-foreground">{subtitle}</p>}
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            {actions ?? (
               <button
                 type="button"
-                aria-label="Notifications"
-                className="relative grid size-9 shrink-0 place-items-center rounded-xl border border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
+                className="grid size-10 place-items-center rounded-xl border border-border bg-card text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="View options"
               >
-                <Bell className="size-4.5" strokeWidth={1.75} />
-                <span className="absolute top-2 right-2.5 size-1.5 rounded-full bg-destructive" />
+                <SlidersHorizontal className="size-4.5" strokeWidth={1.75} />
               </button>
-              {actions}
-            </div>
-          </header>
-
-          <main className="flex-1 px-6 pt-6 pb-10">{children}</main>
+            )}
+          </div>
         </div>
-      </div>
+        {children}
+      </main>
     </div>
+  );
+}
+
+function IconButton({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      className="relative hidden size-9 place-items-center rounded-xl border border-border bg-card text-muted-foreground transition-colors hover:text-foreground md:grid"
+    >
+      {children}
+    </button>
   );
 }
 

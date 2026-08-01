@@ -30,6 +30,11 @@ const map: Record<string, { label: string; tone: Tone }> = {
   sewing: { label: "Sewing", tone: "info" },
   fitting: { label: "Fitting", tone: "primary" },
   completed: { label: "Completed", tone: "success" },
+  // approvals & connections
+  approved: { label: "Approved", tone: "success" },
+  rejected: { label: "Rejected", tone: "danger" },
+  connected: { label: "Paystack connected", tone: "success" },
+  not_connected: { label: "Not connected", tone: "warning" },
   // severity
   high: { label: "High", tone: "danger" },
   medium: { label: "Medium", tone: "warning" },
