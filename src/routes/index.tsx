@@ -50,7 +50,7 @@ function Overview() {
       </section>
 
       <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-3">
-        <div className="solid-card p-5 xl:col-span-2">
+        <div className="solid-card flex flex-col p-5 xl:col-span-2">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-semibold">Signups over time</h2>
@@ -66,7 +66,7 @@ function Overview() {
             </div>
           </div>
 
-          <div className="mt-5 h-64 w-full">
+          <div className="mt-5 min-h-64 w-full flex-1">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={signupSeries} margin={{ top: 4, right: 8, left: -18, bottom: 0 }}>
                 <defs>
