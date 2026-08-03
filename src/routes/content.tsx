@@ -137,7 +137,7 @@ function ContentPage() {
                   </div>
                   <Toggle
                     className="ml-auto"
-                    on={flags[i]}
+                    on={Boolean(flags[i])}
                     label={`Feature ${f.name}`}
                     onToggle={() => {
                       setFlags((prev) => prev.map((v, idx) => (idx === i ? !v : v)));
