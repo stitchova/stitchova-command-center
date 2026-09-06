@@ -25,9 +25,15 @@ const featured = [
 ];
 
 function ContentPage() {
+  const { tiers, saveTiers } = useAdminData();
   const [published, setPublished] = useState(false);
   const [message, setMessage] = useState("");
   const [flags, setFlags] = useState(featured.map((f) => f.on));
+  const [draft, setDraft] = useState<PricingTier[]>(tiers);
+
+  const dirty = JSON.stringify(draft) !== JSON.stringify(tiers);
+  const editTier = (id: string, patch: Partial<PricingTier>) =>
+    setDraft((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
 
   return (
     <AdminShell title="Content Control" subtitle="Pricing, announcements and featured designers">
