@@ -109,7 +109,7 @@ function DesignerDetailBody({
                 value={plan}
                 onChange={(e) => {
                   const next = e.target.value as DesignerProfile["plan"];
-                  setPlan(next);
+                  onPlan(designer.id, next);
                   toast.success(`Plan updated to ${next}. Designer notified.`);
                 }}
                 className="h-9 rounded-lg border border-border bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
@@ -248,8 +248,7 @@ function DesignerDetailBody({
             <button
               type="button"
               onClick={() => {
-                const next = status === "suspended" ? "active" : "suspended";
-                setStatus(next);
+                const next = onToggle(designer.id);
                 toast[next === "suspended" ? "error" : "success"](
                   next === "suspended" ? "Account suspended. Notification sent." : "Account reinstated. Notification sent.",
                 );
@@ -290,7 +289,10 @@ function DesignerDetailBody({
             />
             <button
               type="button"
-              onClick={() => toast.success("Internal note saved.")}
+              onClick={() => {
+                onNotes(designer.id, notes);
+                toast.success("Internal note saved.");
+              }}
               className="mt-2 w-full rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
             >
               Save note
