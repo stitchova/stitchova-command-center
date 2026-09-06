@@ -309,7 +309,7 @@ function IssuePanel({
     );
   }
 
-  const user = users.find((u) => u.name === issue.user);
+  const user = allUsers.find((u) => u.name === issue.user);
 
   return (
     <aside className="glass-panel sticky top-24 h-fit max-h-[calc(100vh-8rem)] overflow-auto p-5">
