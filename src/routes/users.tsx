@@ -222,7 +222,6 @@ function DetailPanel({
     );
   }
 
-  const hasProfile = Boolean(designerProfiles[user.id]);
 
   return (
     <aside className="glass-panel sticky top-24 h-fit max-h-[calc(100vh-8rem)] overflow-auto p-5">
