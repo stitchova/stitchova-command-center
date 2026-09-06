@@ -51,29 +51,39 @@ function ContentPage() {
               <h2 className="text-sm font-semibold">Pricing tiers</h2>
               <p className="text-xs text-muted-foreground">Changes sync to the mobile app paywall.</p>
             </div>
-            <button
-              type="button"
-              onClick={() => toast.success("Pricing saved. Paywall updated in the mobile app.")}
-              className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              Save pricing
-            </button>
+            <div className="flex items-center gap-2">
+              {dirty && <span className="text-xs font-medium text-warning">Unsaved changes</span>}
+              <button
+                type="button"
+                disabled={!dirty}
+                onClick={() => {
+                  saveTiers(draft);
+                  toast.success("Pricing saved. Paywall updated in the mobile app.");
+                }}
+                className="rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+              >
+                Save pricing
+              </button>
+            </div>
           </div>
 
           <div className="mt-4 space-y-3">
-            {tiers.map((t) => (
+            {draft.map((t) => (
               <div key={t.id} className="rounded-xl border border-border p-4">
                 <div className="flex flex-wrap items-center gap-3">
                   <input
-                    defaultValue={t.name}
-                    aria-label={`${t.name} tier name`}
+                    value={t.name}
+                    onChange={(e) => editTier(t.id, { name: e.target.value })}
+                    aria-label={`${t.id} tier name`}
                     className="h-9 w-32 rounded-lg border border-border bg-card px-3 text-sm font-medium outline-none focus:ring-2 focus:ring-ring/40"
                   />
                   <div className="flex h-9 items-center rounded-lg border border-border bg-card px-3">
                     <span className="text-sm text-muted-foreground">₵</span>
                     <input
-                      defaultValue={t.price}
-                      aria-label={`${t.name} monthly price`}
+                      value={t.price}
+                      onChange={(e) => editTier(t.id, { price: e.target.value.replace(/[^\d.]/g, "") })}
+                      inputMode="numeric"
+                      aria-label={`${t.id} monthly price`}
                       className="num h-full w-16 bg-transparent px-1 text-sm outline-none"
                     />
                     <span className="text-xs text-muted-foreground">/mo</span>
@@ -83,8 +93,9 @@ function ContentPage() {
                   </span>
                 </div>
                 <textarea
-                  defaultValue={t.features}
-                  aria-label={`${t.name} features`}
+                  value={t.features}
+                  onChange={(e) => editTier(t.id, { features: e.target.value })}
+                  aria-label={`${t.id} features`}
                   rows={2}
                   className="mt-3 w-full resize-none rounded-lg border border-border bg-card p-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
                 />
