@@ -42,6 +42,11 @@ const activityTone: Record<ActivityKind, string> = {
 };
 
 function Overview() {
+  const { decisions, profiles } = useAdminData();
+  const pendingCount = pendingDesigners.filter((d) => !decisions[d.id]).length;
+  const stuckCount = platformOrders.filter((o) => o.stuckDays >= 3).length;
+  const unconnected = Object.values(profiles).filter((p) => p.paystack !== "connected").length;
+
   return (
     <AdminShell title="Overview" subtitle="Platform health at a glance · August 2026">
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -50,6 +55,34 @@ function Overview() {
         <StatCard glass icon={CircleDollarSign} label="Revenue this month" value="₵61,350" delta={{ value: "+16.2%", direction: "up", note: "vs July" }} />
         <StatCard glass icon={UserPlus} label="New signups" value="382" delta={{ value: "-3.4%", direction: "down", note: "vs July" }} />
       </section>
+
+      <section className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <ActionCard
+          to="/approvals"
+          icon={UserCheck}
+          tone="warning"
+          count={pendingCount}
+          title="Designers awaiting review"
+          detail="Open the approval queue"
+        />
+        <ActionCard
+          to="/orders"
+          icon={AlertTriangle}
+          tone="danger"
+          count={stuckCount}
+          title="Orders with no update"
+          detail="Stuck 3+ days"
+        />
+        <ActionCard
+          to="/revenue"
+          icon={CreditCard}
+          tone="info"
+          count={unconnected}
+          title="Payout accounts not connected"
+          detail="Designers can't be paid out"
+        />
+      </section>
+
 
       <section className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-3">
         <div className="solid-card flex flex-col p-5 xl:col-span-2">
