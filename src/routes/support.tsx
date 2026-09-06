@@ -106,7 +106,7 @@ function SupportPage() {
               <StatusPill value={match.status} />
             </div>
             <div className="ml-auto flex flex-wrap gap-2">
-              {designerProfiles[match.id] && (
+              {profiles[match.id] && (
                 <Link
                   to="/designers/$id"
                   params={{ id: match.id }}
@@ -131,10 +131,27 @@ function SupportPage() {
               </button>
               <button
                 type="button"
-                onClick={() => toast.error(`${match.name} suspended. Notification sent.`)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-destructive/30 px-3 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+                onClick={() => {
+                  const next = toggleUserSuspension(match.id);
+                  if (next === "suspended") {
+                    toast.error(`${match.name} suspended. Notification sent.`);
+                  } else {
+                    toast.success(`${match.name} reinstated. Notification sent.`);
+                  }
+                }}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition-colors",
+                  match.status === "suspended"
+                    ? "border-success/40 text-success hover:bg-success/10"
+                    : "border-destructive/30 text-destructive hover:bg-destructive/10",
+                )}
               >
-                <ShieldAlert className="size-4" strokeWidth={1.75} /> Suspend
+                {match.status === "suspended" ? (
+                  <ShieldCheck className="size-4" strokeWidth={1.75} />
+                ) : (
+                  <ShieldAlert className="size-4" strokeWidth={1.75} />
+                )}
+                {match.status === "suspended" ? "Reinstate" : "Suspend"}
               </button>
             </div>
           </div>
