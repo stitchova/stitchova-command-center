@@ -28,6 +28,7 @@ const tabs: { id: UserRole | "all"; label: string }[] = [
 ];
 
 function UsersPage() {
+  const { users, profiles, toggleUserSuspension } = useAdminData();
   const [tab, setTab] = useState<UserRole | "all">("all");
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
