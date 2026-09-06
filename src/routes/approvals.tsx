@@ -247,8 +247,8 @@ function ReviewPanel({
       {resolved ? (
         <p className="mt-4 rounded-xl bg-panel/60 px-3 py-3 text-sm text-panel-muted">
           {state === "approved"
-            ? "Approved — designer moved to the Users list as Active. SMS + email sent."
-            : "Rejected — designer moved to the Users list as Rejected. SMS + email sent."}
+            ? "Approved — added to the Users list as an Active designer. SMS + email sent."
+            : "Rejected — applicant notified by SMS + email. They were not added to Users."}
         </p>
       ) : (
         <div className="mt-4 flex gap-2">
