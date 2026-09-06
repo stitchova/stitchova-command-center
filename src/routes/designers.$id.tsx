@@ -37,9 +37,28 @@ export const Route = createFileRoute("/designers/$id")({
 });
 
 function DesignerDetail() {
-  const { designer } = Route.useLoaderData() as { designer: DesignerProfile };
-  const [plan, setPlan] = useState(designer.plan);
-  const [status, setStatus] = useState(designer.status);
+  const { id } = Route.useLoaderData();
+  const { profiles, setDesignerPlan, setDesignerNotes, toggleUserSuspension } = useAdminData();
+  const designer = profiles[id];
+
+  if (!designer) throw notFound();
+
+  return <DesignerDetailBody designer={designer} onPlan={setDesignerPlan} onNotes={setDesignerNotes} onToggle={toggleUserSuspension} />;
+}
+
+function DesignerDetailBody({
+  designer,
+  onPlan,
+  onNotes,
+  onToggle,
+}: {
+  designer: DesignerProfile;
+  onPlan: (id: string, plan: DesignerProfile["plan"]) => void;
+  onNotes: (id: string, notes: string) => void;
+  onToggle: (id: string) => string;
+}) {
+  const plan = designer.plan;
+  const status = designer.status;
   const [notes, setNotes] = useState(designer.notes);
 
   return (
