@@ -46,7 +46,7 @@ function UsersPage() {
           (query.trim() === "" ||
             `${u.name} ${u.phone} ${u.id}`.toLowerCase().includes(query.trim().toLowerCase())),
       ),
-    [tab, status, plan, query],
+    [users, tab, status, plan, query],
   );
 
   const selected = filtered.find((u) => u.id === selectedId) ?? null;
@@ -137,7 +137,7 @@ function UsersPage() {
               </thead>
               <tbody>
                 {filtered.map((u) => {
-                  const hasProfile = Boolean(designerProfiles[u.id]);
+                  const hasProfile = Boolean(profiles[u.id]);
                   return (
                     <tr
                       key={u.id}
@@ -179,13 +179,38 @@ function UsersPage() {
           </div>
         </div>
 
-        <DetailPanel user={selected} onClose={() => setSelectedId(null)} />
+        <DetailPanel
+          user={selected}
+          hasProfile={Boolean(selected && profiles[selected.id])}
+          onClose={() => setSelectedId(null)}
+          onToggleSuspend={(u) => {
+            const next = toggleUserSuspension(u.id);
+            if (next === "suspended") {
+              toast.error(`${u.name} suspended. Notification sent.`);
+            } else {
+              toast.success(`${u.name} reinstated. Notification sent.`);
+            }
+          }}
+          onMessage={(u) => toast.success(`Message thread opened with ${u.name}.`, { description: `SMS will go to ${u.phone}.` })}
+        />
       </div>
     </AdminShell>
   );
 }
 
-function DetailPanel({ user, onClose }: { user: AdminUser | null; onClose: () => void }) {
+function DetailPanel({
+  user,
+  hasProfile,
+  onClose,
+  onToggleSuspend,
+  onMessage,
+}: {
+  user: AdminUser | null;
+  hasProfile: boolean;
+  onClose: () => void;
+  onToggleSuspend: (u: AdminUser) => void;
+  onMessage: (u: AdminUser) => void;
+}) {
   if (!user) {
     return (
       <aside className="glass-panel grid min-h-72 place-items-center p-8 text-center">
