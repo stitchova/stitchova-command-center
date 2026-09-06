@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowUpRight, Mail, MapPin, Phone, Ruler, Search, ShieldAlert, X } from "lucide-react";
+import { toast } from "sonner";
+import { ArrowUpRight, Mail, MapPin, Phone, Ruler, Search, ShieldAlert, ShieldCheck, X } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { StatusPill } from "@/components/admin/StatusPill";
-import { users, type AdminUser, type UserRole } from "@/lib/admin-data";
-import { designerProfiles } from "@/lib/designer-data";
+import { type AdminUser, type UserRole } from "@/lib/admin-data";
+import { useAdminData } from "@/lib/admin-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/users")({
