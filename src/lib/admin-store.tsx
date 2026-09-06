@@ -91,10 +91,10 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
 
   const decideApplication = useCallback(
     (applicant: PendingDesigner, status: ApprovalStatus, reason?: string) => {
-      setDecisions((prev) => ({
-        ...prev,
-        [applicant.id]: { status, reason: reason?.trim() || undefined, decidedAt: today },
-      }));
+      const decision: ApprovalDecision = reason?.trim()
+        ? { status, reason: reason.trim(), decidedAt: today }
+        : { status, decidedAt: today };
+      setDecisions((prev) => ({ ...prev, [applicant.id]: decision }));
 
       if (status !== "approved") return;
 
