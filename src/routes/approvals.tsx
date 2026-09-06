@@ -118,7 +118,7 @@ function ApprovalsPage() {
         <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
           <ul className="space-y-2">
             {rows.map((d) => {
-              const state = decisions[d.id] ?? "pending";
+              const state = stateOf(d.id);
               const active = selected?.id === d.id;
               return (
                 <li key={d.id}>
@@ -162,7 +162,7 @@ function ApprovalsPage() {
           </ul>
 
           {selected ? (
-            <ReviewPanel key={selected.id} designer={selected} state={decisions[selected.id] ?? "pending"} onDecide={decide} />
+            <ReviewPanel key={selected.id} designer={selected} state={stateOf(selected.id)} onDecide={decide} />
           ) : (
             <div className="work-glass grid min-h-72 place-items-center p-8 text-center text-sm text-panel-muted">
               Select an application to review it.
