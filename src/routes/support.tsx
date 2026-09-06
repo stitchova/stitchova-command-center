@@ -9,14 +9,15 @@ import {
   MailCheck,
   Search,
   ShieldAlert,
+  ShieldCheck,
   Siren,
   User as UserIcon,
   X,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { StatusPill } from "@/components/admin/StatusPill";
-import { flaggedIssues, users } from "@/lib/admin-data";
-import { designerProfiles } from "@/lib/designer-data";
+import { flaggedIssues, type AdminUser } from "@/lib/admin-data";
+import { useAdminData } from "@/lib/admin-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/support")({
