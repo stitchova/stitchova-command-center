@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Banknote, CircleDollarSign, Package, TrendingUp, UserPlus, Users, Zap } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { AlertTriangle, Banknote, ChevronRight, CircleDollarSign, CreditCard, Package, TrendingUp, UserCheck, UserPlus, Users, Zap } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -11,7 +11,9 @@ import {
 } from "recharts";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { StatCard } from "@/components/admin/StatCard";
-import { activityFeed, signupSeries, type ActivityKind } from "@/lib/admin-data";
+import { activityFeed, platformOrders, signupSeries, type ActivityKind } from "@/lib/admin-data";
+import { pendingDesigners } from "@/lib/designer-data";
+import { useAdminData } from "@/lib/admin-store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
