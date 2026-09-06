@@ -36,6 +36,7 @@ type Issue = (typeof flaggedIssues)[number];
 const severities = ["all", "high", "medium", "low"] as const;
 
 function SupportPage() {
+  const { users, profiles, toggleUserSuspension } = useAdminData();
   const [lookup, setLookup] = useState("");
   const [severity, setSeverity] = useState<(typeof severities)[number]>("all");
   const [issueQuery, setIssueQuery] = useState("");
