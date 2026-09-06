@@ -240,6 +240,7 @@ function SupportPage() {
         </div>
 
         <IssuePanel
+          allUsers={users}
           issue={selected}
           resolved={selected ? resolved.includes(selected.id) : false}
           onResolve={(id) => {
@@ -283,11 +284,13 @@ function Stat({
 }
 
 function IssuePanel({
+  allUsers,
   issue,
   resolved,
   onResolve,
   onClose,
 }: {
+  allUsers: AdminUser[];
   issue: Issue | null;
   resolved: boolean;
   onResolve: (id: string) => void;
