@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Megaphone, Sparkles, Tags, Users as UsersIcon } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { useAdminData, type PricingTier } from "@/lib/admin-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/content")({
@@ -16,12 +17,6 @@ export const Route = createFileRoute("/content")({
   }),
   component: ContentPage,
 });
-
-const tiers = [
-  { id: "free", name: "Free", price: "0", features: "3 active orders, basic measurements", subs: 412 },
-  { id: "pro", name: "Pro", price: "180", features: "Unlimited orders, invoices, workshop chat", subs: 186 },
-  { id: "atelier", name: "Atelier", price: "420", features: "Everything in Pro, team seats, showcase", subs: 41 },
-];
 
 const featured = [
   { name: "Ama Serwaa", location: "Osu, Accra", on: true },
