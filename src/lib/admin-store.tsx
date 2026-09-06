@@ -29,7 +29,7 @@ const seedTiers: PricingTier[] = [
 
 export interface ApprovalDecision {
   status: ApprovalStatus;
-  reason?: string;
+  reason?: string | undefined;
   decidedAt: string;
 }
 
