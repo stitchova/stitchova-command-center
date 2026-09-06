@@ -322,16 +322,27 @@ function DetailPanel({
       <div className="mt-5 flex gap-2">
         <button
           type="button"
+          onClick={() => onMessage(user)}
           className="flex-1 rounded-xl bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-muted"
         >
           Message user
         </button>
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-destructive/30 px-3 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+          onClick={() => onToggleSuspend(user)}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition-colors",
+            user.status === "suspended"
+              ? "border-success/40 text-success hover:bg-success/10"
+              : "border-destructive/30 text-destructive hover:bg-destructive/10",
+          )}
         >
-          <ShieldAlert className="size-4" strokeWidth={1.75} />
-          Suspend
+          {user.status === "suspended" ? (
+            <ShieldCheck className="size-4" strokeWidth={1.75} />
+          ) : (
+            <ShieldAlert className="size-4" strokeWidth={1.75} />
+          )}
+          {user.status === "suspended" ? "Reinstate" : "Suspend"}
         </button>
       </div>
     </aside>
