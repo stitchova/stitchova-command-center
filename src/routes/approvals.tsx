@@ -6,6 +6,7 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { StatCard } from "@/components/admin/StatCard";
 import { StatusPill } from "@/components/admin/StatusPill";
 import { pendingDesigners, type ApprovalStatus, type PendingDesigner, type PortfolioItem } from "@/lib/designer-data";
+import { useAdminData } from "@/lib/admin-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/approvals")({
@@ -21,15 +22,17 @@ export const Route = createFileRoute("/approvals")({
 });
 
 function ApprovalsPage() {
-  const [decisions, setDecisions] = useState<Record<string, ApprovalStatus>>({});
+  const { decisions, decideApplication } = useAdminData();
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"pending" | "all">("pending");
   const [selectedId, setSelectedId] = useState<string | null>(pendingDesigners[0]?.id ?? null);
 
+  const stateOf = (id: string): ApprovalStatus => decisions[id]?.status ?? "pending";
+
   const rows = useMemo(
     () =>
       pendingDesigners.filter((d) => {
-        const state = decisions[d.id] ?? "pending";
+        const state = decisions[d.id]?.status ?? "pending";
         if (filter === "pending" && state !== "pending") return false;
         if (query.trim() && !`${d.name} ${d.phone} ${d.id}`.toLowerCase().includes(query.trim().toLowerCase())) return false;
         return true;
@@ -38,10 +41,10 @@ function ApprovalsPage() {
   );
 
   const selected = rows.find((d) => d.id === selectedId) ?? rows[0] ?? null;
-  const pendingCount = pendingDesigners.filter((d) => (decisions[d.id] ?? "pending") === "pending").length;
+  const pendingCount = pendingDesigners.filter((d) => (decisions[d.id]?.status ?? "pending") === "pending").length;
 
   const decide = (designer: PendingDesigner, status: ApprovalStatus, reason?: string) => {
-    setDecisions((prev) => ({ ...prev, [designer.id]: status }));
+    decideApplication(designer, status, reason);
     if (status === "approved") {
       toast.success("Designer approved. Notification sent.", {
         description: `${designer.name} is now Active — SMS + email sent to ${designer.phone}.`,
@@ -115,7 +118,7 @@ function ApprovalsPage() {
         <div className="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
           <ul className="space-y-2">
             {rows.map((d) => {
-              const state = decisions[d.id] ?? "pending";
+              const state = stateOf(d.id);
               const active = selected?.id === d.id;
               return (
                 <li key={d.id}>
@@ -159,7 +162,7 @@ function ApprovalsPage() {
           </ul>
 
           {selected ? (
-            <ReviewPanel key={selected.id} designer={selected} state={decisions[selected.id] ?? "pending"} onDecide={decide} />
+            <ReviewPanel key={selected.id} designer={selected} state={stateOf(selected.id)} onDecide={decide} />
           ) : (
             <div className="work-glass grid min-h-72 place-items-center p-8 text-center text-sm text-panel-muted">
               Select an application to review it.
@@ -244,8 +247,8 @@ function ReviewPanel({
       {resolved ? (
         <p className="mt-4 rounded-xl bg-panel/60 px-3 py-3 text-sm text-panel-muted">
           {state === "approved"
-            ? "Approved — designer moved to the Users list as Active. SMS + email sent."
-            : "Rejected — designer moved to the Users list as Rejected. SMS + email sent."}
+            ? "Approved — added to the Users list as an Active designer. SMS + email sent."
+            : "Rejected — applicant notified by SMS + email. They were not added to Users."}
         </p>
       ) : (
         <div className="mt-4 flex gap-2">

@@ -17,16 +17,13 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { StatusPill } from "@/components/admin/StatusPill";
 import { cedis, designerProfiles, type DesignerProfile } from "@/lib/designer-data";
+import { useAdminData } from "@/lib/admin-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/designers/$id")({
-  loader: ({ params }) => {
-    const designer = designerProfiles[params.id];
-    if (!designer) throw notFound();
-    return { designer };
-  },
+  loader: ({ params }) => ({ id: params.id, name: designerProfiles[params.id]?.name ?? "Designer" }),
   head: ({ loaderData }) => {
-    const name = loaderData?.designer.name ?? "Designer";
+    const name = loaderData?.name ?? "Designer";
     return {
       meta: [
         { title: `${name} · Designer Profile · Stitchova Admin` },
@@ -40,9 +37,28 @@ export const Route = createFileRoute("/designers/$id")({
 });
 
 function DesignerDetail() {
-  const { designer } = Route.useLoaderData() as { designer: DesignerProfile };
-  const [plan, setPlan] = useState(designer.plan);
-  const [status, setStatus] = useState(designer.status);
+  const { id } = Route.useLoaderData();
+  const { profiles, setDesignerPlan, setDesignerNotes, toggleUserSuspension } = useAdminData();
+  const designer = profiles[id];
+
+  if (!designer) throw notFound();
+
+  return <DesignerDetailBody designer={designer} onPlan={setDesignerPlan} onNotes={setDesignerNotes} onToggle={toggleUserSuspension} />;
+}
+
+function DesignerDetailBody({
+  designer,
+  onPlan,
+  onNotes,
+  onToggle,
+}: {
+  designer: DesignerProfile;
+  onPlan: (id: string, plan: DesignerProfile["plan"]) => void;
+  onNotes: (id: string, notes: string) => void;
+  onToggle: (id: string) => string;
+}) {
+  const plan = designer.plan;
+  const status = designer.status;
   const [notes, setNotes] = useState(designer.notes);
 
   return (
@@ -93,7 +109,7 @@ function DesignerDetail() {
                 value={plan}
                 onChange={(e) => {
                   const next = e.target.value as DesignerProfile["plan"];
-                  setPlan(next);
+                  onPlan(designer.id, next);
                   toast.success(`Plan updated to ${next}. Designer notified.`);
                 }}
                 className="h-9 rounded-lg border border-border bg-card px-3 text-sm outline-none focus:ring-2 focus:ring-ring/40"
@@ -232,8 +248,7 @@ function DesignerDetail() {
             <button
               type="button"
               onClick={() => {
-                const next = status === "suspended" ? "active" : "suspended";
-                setStatus(next);
+                const next = onToggle(designer.id);
                 toast[next === "suspended" ? "error" : "success"](
                   next === "suspended" ? "Account suspended. Notification sent." : "Account reinstated. Notification sent.",
                 );
@@ -274,7 +289,10 @@ function DesignerDetail() {
             />
             <button
               type="button"
-              onClick={() => toast.success("Internal note saved.")}
+              onClick={() => {
+                onNotes(designer.id, notes);
+                toast.success("Internal note saved.");
+              }}
               className="mt-2 w-full rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
             >
               Save note

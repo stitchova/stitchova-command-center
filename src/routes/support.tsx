@@ -9,14 +9,15 @@ import {
   MailCheck,
   Search,
   ShieldAlert,
+  ShieldCheck,
   Siren,
   User as UserIcon,
   X,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { StatusPill } from "@/components/admin/StatusPill";
-import { flaggedIssues, users } from "@/lib/admin-data";
-import { designerProfiles } from "@/lib/designer-data";
+import { flaggedIssues, type AdminUser } from "@/lib/admin-data";
+import { useAdminData } from "@/lib/admin-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/support")({
@@ -35,6 +36,7 @@ type Issue = (typeof flaggedIssues)[number];
 const severities = ["all", "high", "medium", "low"] as const;
 
 function SupportPage() {
+  const { users, profiles, toggleUserSuspension } = useAdminData();
   const [lookup, setLookup] = useState("");
   const [severity, setSeverity] = useState<(typeof severities)[number]>("all");
   const [issueQuery, setIssueQuery] = useState("");
@@ -104,7 +106,7 @@ function SupportPage() {
               <StatusPill value={match.status} />
             </div>
             <div className="ml-auto flex flex-wrap gap-2">
-              {designerProfiles[match.id] && (
+              {profiles[match.id] && (
                 <Link
                   to="/designers/$id"
                   params={{ id: match.id }}
@@ -129,10 +131,27 @@ function SupportPage() {
               </button>
               <button
                 type="button"
-                onClick={() => toast.error(`${match.name} suspended. Notification sent.`)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-destructive/30 px-3 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+                onClick={() => {
+                  const next = toggleUserSuspension(match.id);
+                  if (next === "suspended") {
+                    toast.error(`${match.name} suspended. Notification sent.`);
+                  } else {
+                    toast.success(`${match.name} reinstated. Notification sent.`);
+                  }
+                }}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition-colors",
+                  match.status === "suspended"
+                    ? "border-success/40 text-success hover:bg-success/10"
+                    : "border-destructive/30 text-destructive hover:bg-destructive/10",
+                )}
               >
-                <ShieldAlert className="size-4" strokeWidth={1.75} /> Suspend
+                {match.status === "suspended" ? (
+                  <ShieldCheck className="size-4" strokeWidth={1.75} />
+                ) : (
+                  <ShieldAlert className="size-4" strokeWidth={1.75} />
+                )}
+                {match.status === "suspended" ? "Reinstate" : "Suspend"}
               </button>
             </div>
           </div>
@@ -221,6 +240,7 @@ function SupportPage() {
         </div>
 
         <IssuePanel
+          allUsers={users}
           issue={selected}
           resolved={selected ? resolved.includes(selected.id) : false}
           onResolve={(id) => {
@@ -264,11 +284,13 @@ function Stat({
 }
 
 function IssuePanel({
+  allUsers,
   issue,
   resolved,
   onResolve,
   onClose,
 }: {
+  allUsers: AdminUser[];
   issue: Issue | null;
   resolved: boolean;
   onResolve: (id: string) => void;
@@ -287,7 +309,7 @@ function IssuePanel({
     );
   }
 
-  const user = users.find((u) => u.name === issue.user);
+  const user = allUsers.find((u) => u.name === issue.user);
 
   return (
     <aside className="glass-panel sticky top-24 h-fit max-h-[calc(100vh-8rem)] overflow-auto p-5">

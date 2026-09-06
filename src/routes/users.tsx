@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ArrowUpRight, Mail, MapPin, Phone, Ruler, Search, ShieldAlert, X } from "lucide-react";
+import { toast } from "sonner";
+import { ArrowUpRight, Mail, MapPin, Phone, Ruler, Search, ShieldAlert, ShieldCheck, X } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { StatusPill } from "@/components/admin/StatusPill";
-import { users, type AdminUser, type UserRole } from "@/lib/admin-data";
-import { designerProfiles } from "@/lib/designer-data";
+import { type AdminUser, type UserRole } from "@/lib/admin-data";
+import { useAdminData } from "@/lib/admin-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/users")({
@@ -27,6 +28,7 @@ const tabs: { id: UserRole | "all"; label: string }[] = [
 ];
 
 function UsersPage() {
+  const { users, profiles, toggleUserSuspension } = useAdminData();
   const [tab, setTab] = useState<UserRole | "all">("all");
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
@@ -44,7 +46,7 @@ function UsersPage() {
           (query.trim() === "" ||
             `${u.name} ${u.phone} ${u.id}`.toLowerCase().includes(query.trim().toLowerCase())),
       ),
-    [tab, status, plan, query],
+    [users, tab, status, plan, query],
   );
 
   const selected = filtered.find((u) => u.id === selectedId) ?? null;
@@ -135,7 +137,7 @@ function UsersPage() {
               </thead>
               <tbody>
                 {filtered.map((u) => {
-                  const hasProfile = Boolean(designerProfiles[u.id]);
+                  const hasProfile = Boolean(profiles[u.id]);
                   return (
                     <tr
                       key={u.id}
@@ -177,13 +179,38 @@ function UsersPage() {
           </div>
         </div>
 
-        <DetailPanel user={selected} onClose={() => setSelectedId(null)} />
+        <DetailPanel
+          user={selected}
+          hasProfile={Boolean(selected && profiles[selected.id])}
+          onClose={() => setSelectedId(null)}
+          onToggleSuspend={(u) => {
+            const next = toggleUserSuspension(u.id);
+            if (next === "suspended") {
+              toast.error(`${u.name} suspended. Notification sent.`);
+            } else {
+              toast.success(`${u.name} reinstated. Notification sent.`);
+            }
+          }}
+          onMessage={(u) => toast.success(`Message thread opened with ${u.name}.`, { description: `SMS will go to ${u.phone}.` })}
+        />
       </div>
     </AdminShell>
   );
 }
 
-function DetailPanel({ user, onClose }: { user: AdminUser | null; onClose: () => void }) {
+function DetailPanel({
+  user,
+  hasProfile,
+  onClose,
+  onToggleSuspend,
+  onMessage,
+}: {
+  user: AdminUser | null;
+  hasProfile: boolean;
+  onClose: () => void;
+  onToggleSuspend: (u: AdminUser) => void;
+  onMessage: (u: AdminUser) => void;
+}) {
   if (!user) {
     return (
       <aside className="glass-panel grid min-h-72 place-items-center p-8 text-center">
@@ -195,7 +222,6 @@ function DetailPanel({ user, onClose }: { user: AdminUser | null; onClose: () =>
     );
   }
 
-  const hasProfile = Boolean(designerProfiles[user.id]);
 
   return (
     <aside className="glass-panel sticky top-24 h-fit max-h-[calc(100vh-8rem)] overflow-auto p-5">
@@ -296,16 +322,27 @@ function DetailPanel({ user, onClose }: { user: AdminUser | null; onClose: () =>
       <div className="mt-5 flex gap-2">
         <button
           type="button"
+          onClick={() => onMessage(user)}
           className="flex-1 rounded-xl bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-muted"
         >
           Message user
         </button>
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-destructive/30 px-3 py-2 text-sm font-medium text-destructive transition-colors hover:bg-destructive/10"
+          onClick={() => onToggleSuspend(user)}
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition-colors",
+            user.status === "suspended"
+              ? "border-success/40 text-success hover:bg-success/10"
+              : "border-destructive/30 text-destructive hover:bg-destructive/10",
+          )}
         >
-          <ShieldAlert className="size-4" strokeWidth={1.75} />
-          Suspend
+          {user.status === "suspended" ? (
+            <ShieldCheck className="size-4" strokeWidth={1.75} />
+          ) : (
+            <ShieldAlert className="size-4" strokeWidth={1.75} />
+          )}
+          {user.status === "suspended" ? "Reinstate" : "Suspend"}
         </button>
       </div>
     </aside>
