@@ -17,16 +17,13 @@ import { toast } from "sonner";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { StatusPill } from "@/components/admin/StatusPill";
 import { cedis, designerProfiles, type DesignerProfile } from "@/lib/designer-data";
+import { useAdminData } from "@/lib/admin-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/designers/$id")({
-  loader: ({ params }) => {
-    const designer = designerProfiles[params.id];
-    if (!designer) throw notFound();
-    return { designer };
-  },
+  loader: ({ params }) => ({ id: params.id, name: designerProfiles[params.id]?.name ?? "Designer" }),
   head: ({ loaderData }) => {
-    const name = loaderData?.designer.name ?? "Designer";
+    const name = loaderData?.name ?? "Designer";
     return {
       meta: [
         { title: `${name} · Designer Profile · Stitchova Admin` },
