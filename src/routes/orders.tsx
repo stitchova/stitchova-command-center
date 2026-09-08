@@ -27,6 +27,8 @@ const pipeline: OrderStage[] = ["cutting", "sewing", "fitting", "completed"];
 type Order = (typeof platformOrders)[number];
 
 function OrdersPage() {
+  const { addIssue } = useAdminData();
+  const [escalated, setEscalated] = useState<string[]>([]);
   const [stage, setStage] = useState<(typeof stages)[number]>("all");
   const [stuckOnly, setStuckOnly] = useState(false);
   const [query, setQuery] = useState("");
