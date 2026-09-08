@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import {
   users as seedUsers,
+  flaggedIssues,
   type AdminUser,
   type Plan,
   type UserStatus,
@@ -27,6 +28,19 @@ const seedTiers: PricingTier[] = [
   { id: "atelier", name: "Atelier", price: "420", features: "Everything in Pro, team seats, showcase", subs: 41 },
 ];
 
+export interface SupportIssue {
+  id: string;
+  user: string;
+  subject: string;
+  severity: "high" | "medium" | "low";
+  opened: string;
+}
+
+const seedIssues: SupportIssue[] = flaggedIssues.map((i) => ({
+  ...i,
+  severity: i.severity as SupportIssue["severity"],
+}));
+
 export interface ApprovalDecision {
   status: ApprovalStatus;
   reason?: string | undefined;
@@ -38,6 +52,8 @@ interface AdminStore {
   profiles: Record<string, DesignerProfile>;
   decisions: Record<string, ApprovalDecision>;
   tiers: PricingTier[];
+  issues: SupportIssue[];
+  addIssue: (issue: SupportIssue) => void;
   setUserStatus: (id: string, status: UserStatus) => void;
   toggleUserSuspension: (id: string) => UserStatus;
   setDesignerPlan: (id: string, plan: Plan) => void;
@@ -55,6 +71,11 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [profiles, setProfiles] = useState<Record<string, DesignerProfile>>(seedProfiles);
   const [decisions, setDecisions] = useState<Record<string, ApprovalDecision>>({});
   const [tiers, setTiers] = useState<PricingTier[]>(seedTiers);
+  const [issues, setIssues] = useState<SupportIssue[]>(seedIssues);
+
+  const addIssue = useCallback((issue: SupportIssue) => {
+    setIssues((prev) => (prev.some((i) => i.id === issue.id) ? prev : [issue, ...prev]));
+  }, []);
 
   const setUserStatus = useCallback((id: string, status: UserStatus) => {
     setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, status } : u)));
@@ -163,6 +184,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       profiles,
       decisions,
       tiers,
+      issues,
+      addIssue,
       setUserStatus,
       toggleUserSuspension,
       setDesignerPlan,
@@ -170,7 +193,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       decideApplication,
       saveTiers,
     }),
-    [users, profiles, decisions, tiers, setUserStatus, toggleUserSuspension, setDesignerPlan, setDesignerNotes, decideApplication, saveTiers],
+    [users, profiles, decisions, tiers, issues, addIssue, setUserStatus, toggleUserSuspension, setDesignerPlan, setDesignerNotes, decideApplication, saveTiers],
   );
 
   return <AdminDataContext.Provider value={value}>{children}</AdminDataContext.Provider>;

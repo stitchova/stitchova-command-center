@@ -5,6 +5,8 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { StatusPill } from "@/components/admin/StatusPill";
 import { platformOrders, users, type OrderStage } from "@/lib/admin-data";
 import { designerProfiles } from "@/lib/designer-data";
+import { useAdminData } from "@/lib/admin-store";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/orders")({
@@ -25,6 +27,8 @@ const pipeline: OrderStage[] = ["cutting", "sewing", "fitting", "completed"];
 type Order = (typeof platformOrders)[number];
 
 function OrdersPage() {
+  const { addIssue } = useAdminData();
+  const [escalated, setEscalated] = useState<string[]>([]);
   const [stage, setStage] = useState<(typeof stages)[number]>("all");
   const [stuckOnly, setStuckOnly] = useState(false);
   const [query, setQuery] = useState("");
@@ -154,7 +158,24 @@ function OrdersPage() {
           </div>
         </div>
 
-        <OrderPanel order={selected} onClose={() => setSelectedId(null)} />
+        <OrderPanel
+          order={selected}
+          onClose={() => setSelectedId(null)}
+          escalated={selected ? escalated.includes(selected.id) : false}
+          onEscalate={(o) => {
+            addIssue({
+              id: `ESC-${o.id}`,
+              user: o.client,
+              subject: `Order ${o.id} stuck ${o.stuckDays} days — escalated from Orders`,
+              severity: o.stuckDays >= 7 ? "high" : "medium",
+              opened: "Just now",
+            });
+            setEscalated((prev) => (prev.includes(o.id) ? prev : [...prev, o.id]));
+            toast.success(`${o.id} escalated to Support.`, {
+              description: `Added to the issue queue as ${o.stuckDays >= 7 ? "high" : "medium"} severity.`,
+            });
+          }}
+        />
       </div>
     </AdminShell>
   );
@@ -189,7 +210,17 @@ function Stat({
   );
 }
 
-function OrderPanel({ order, onClose }: { order: Order | null; onClose: () => void }) {
+function OrderPanel({
+  order,
+  onClose,
+  escalated,
+  onEscalate,
+}: {
+  order: Order | null;
+  onClose: () => void;
+  escalated: boolean;
+  onEscalate: (order: Order) => void;
+}) {
   if (!order) {
     return (
       <aside className="glass-panel grid min-h-72 place-items-center p-8 text-center">
@@ -276,6 +307,48 @@ function OrderPanel({ order, onClose }: { order: Order | null; onClose: () => vo
           );
         })}
       </ol>
+
+      <h3 className="mt-5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Admin actions</h3>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => toast.success(`Conversation with ${order.client} opened.`)}
+          className="rounded-xl border border-border px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
+        >
+          Message client
+        </button>
+        <button
+          type="button"
+          onClick={() => toast.success(`Conversation with ${order.designer} opened.`)}
+          className="rounded-xl border border-border px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
+        >
+          Message designer
+        </button>
+        {stuck && (
+          <>
+            <button
+              type="button"
+              onClick={() => toast.success(`Reminder sent to ${order.designer}.`)}
+              className="rounded-xl border border-warning/40 bg-warning/10 px-3 py-2.5 text-sm font-medium text-warning transition-colors hover:bg-warning/20"
+            >
+              Nudge designer
+            </button>
+            {escalated ? (
+              <span className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-muted px-3 py-2.5 text-sm font-medium text-muted-foreground">
+                <CheckCircle2 className="size-4" strokeWidth={2} /> Escalated
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onEscalate(order)}
+                className="rounded-xl border border-destructive/40 bg-destructive/10 px-3 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/20"
+              >
+                Escalate to Support
+              </button>
+            )}
+          </>
+        )}
+      </div>
 
       {hasProfile && designer && (
         <Link

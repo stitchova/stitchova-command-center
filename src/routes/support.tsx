@@ -16,8 +16,8 @@ import {
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { StatusPill } from "@/components/admin/StatusPill";
-import { flaggedIssues, type AdminUser } from "@/lib/admin-data";
-import { useAdminData } from "@/lib/admin-store";
+import { type AdminUser } from "@/lib/admin-data";
+import { useAdminData, type SupportIssue } from "@/lib/admin-store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/support")({
@@ -32,16 +32,16 @@ export const Route = createFileRoute("/support")({
   component: SupportPage,
 });
 
-type Issue = (typeof flaggedIssues)[number];
+type Issue = SupportIssue;
 const severities = ["all", "high", "medium", "low"] as const;
 
 function SupportPage() {
-  const { users, profiles, toggleUserSuspension } = useAdminData();
+  const { users, profiles, toggleUserSuspension, issues } = useAdminData();
   const [lookup, setLookup] = useState("");
   const [severity, setSeverity] = useState<(typeof severities)[number]>("all");
   const [issueQuery, setIssueQuery] = useState("");
   const [resolved, setResolved] = useState<string[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(flaggedIssues[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState<string | null>(issues[0]?.id ?? null);
 
   const match = lookup.trim()
     ? users.find((u) => `${u.name} ${u.phone} ${u.id}`.toLowerCase().includes(lookup.trim().toLowerCase()))
@@ -49,18 +49,18 @@ function SupportPage() {
 
   const rows = useMemo(
     () =>
-      flaggedIssues.filter(
+      issues.filter(
         (i) =>
           (severity === "all" || i.severity === severity) &&
           (issueQuery.trim() === "" ||
             `${i.id} ${i.user} ${i.subject}`.toLowerCase().includes(issueQuery.trim().toLowerCase())),
       ),
-    [severity, issueQuery],
+    [issues, severity, issueQuery],
   );
 
   const selected = rows.find((i) => i.id === selectedId) ?? null;
-  const open = flaggedIssues.length - resolved.length;
-  const high = flaggedIssues.filter((i) => i.severity === "high" && !resolved.includes(i.id)).length;
+  const open = issues.length - resolved.length;
+  const high = issues.filter((i) => i.severity === "high" && !resolved.includes(i.id)).length;
 
   return (
     <AdminShell title="Support Tools" subtitle="Account lookup and issue triage">
