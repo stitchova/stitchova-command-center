@@ -300,7 +300,7 @@ export function AdminShell({
   );
 }
 
-function CalRow({ label, value, tone }: { label: string; value: string; tone?: "warn" }) {
+function CalRow({ label, value, tone }: { label: string; value: string; tone?: "warn" | undefined }) {
   return (
     <li className="flex items-center justify-between gap-3">
       <span className="text-muted-foreground">{label}</span>
