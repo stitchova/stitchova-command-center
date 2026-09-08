@@ -69,6 +69,11 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [profiles, setProfiles] = useState<Record<string, DesignerProfile>>(seedProfiles);
   const [decisions, setDecisions] = useState<Record<string, ApprovalDecision>>({});
   const [tiers, setTiers] = useState<PricingTier[]>(seedTiers);
+  const [issues, setIssues] = useState<SupportIssue[]>(seedIssues);
+
+  const addIssue = useCallback((issue: SupportIssue) => {
+    setIssues((prev) => (prev.some((i) => i.id === issue.id) ? prev : [issue, ...prev]));
+  }, []);
 
   const setUserStatus = useCallback((id: string, status: UserStatus) => {
     setUsers((prev) => prev.map((u) => (u.id === id ? { ...u, status } : u)));
