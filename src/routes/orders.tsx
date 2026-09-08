@@ -308,6 +308,48 @@ function OrderPanel({
         })}
       </ol>
 
+      <h3 className="mt-5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">Admin actions</h3>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => toast.success(`Conversation with ${order.client} opened.`)}
+          className="rounded-xl border border-border px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
+        >
+          Message client
+        </button>
+        <button
+          type="button"
+          onClick={() => toast.success(`Conversation with ${order.designer} opened.`)}
+          className="rounded-xl border border-border px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
+        >
+          Message designer
+        </button>
+        {stuck && (
+          <>
+            <button
+              type="button"
+              onClick={() => toast.success(`Reminder sent to ${order.designer}.`)}
+              className="rounded-xl border border-warning/40 bg-warning/10 px-3 py-2.5 text-sm font-medium text-warning transition-colors hover:bg-warning/20"
+            >
+              Nudge designer
+            </button>
+            {escalated ? (
+              <span className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-muted px-3 py-2.5 text-sm font-medium text-muted-foreground">
+                <CheckCircle2 className="size-4" strokeWidth={2} /> Escalated
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => onEscalate(order)}
+                className="rounded-xl border border-destructive/40 bg-destructive/10 px-3 py-2.5 text-sm font-medium text-destructive transition-colors hover:bg-destructive/20"
+              >
+                Escalate to Support
+              </button>
+            )}
+          </>
+        )}
+      </div>
+
       {hasProfile && designer && (
         <Link
           to="/designers/$id"
