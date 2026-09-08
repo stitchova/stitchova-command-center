@@ -32,6 +32,7 @@ function ContentPage() {
   const [draft, setDraft] = useState<PricingTier[]>(tiers);
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(tiers);
+  const paidSubscribers = tiers.filter((t) => t.id !== "free").reduce((sum, t) => sum + t.subs, 0);
   const editTier = (id: string, patch: Partial<PricingTier>) =>
     setDraft((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
 
@@ -39,7 +40,7 @@ function ContentPage() {
     <AdminShell title="Content Control" subtitle="Pricing, announcements and featured designers">
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat icon={Tags} label="Active tiers" value={String(tiers.length)} />
-        <Stat icon={UsersIcon} label="Paid subscribers" value="227" />
+        <Stat icon={UsersIcon} label="Paid subscribers" value={String(paidSubscribers)} />
         <Stat icon={Sparkles} label="Featured designers" value={String(flags.filter(Boolean).length)} />
         <Stat icon={Megaphone} label="Banner" value={published ? "Live" : "Draft"} />
       </div>

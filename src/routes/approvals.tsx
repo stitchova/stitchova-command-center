@@ -42,6 +42,9 @@ function ApprovalsPage() {
 
   const selected = rows.find((d) => d.id === selectedId) ?? rows[0] ?? null;
   const pendingCount = pendingDesigners.filter((d) => (decisions[d.id]?.status ?? "pending") === "pending").length;
+  const decisionList = Object.values(decisions);
+  const approvedCount = decisionList.filter((d) => d.status === "approved").length;
+  const rejectedCount = decisionList.filter((d) => d.status === "rejected").length;
 
   const decide = (designer: PendingDesigner, status: ApprovalStatus, reason?: string) => {
     decideApplication(designer, status, reason);
@@ -74,8 +77,8 @@ function ApprovalsPage() {
     >
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard glass icon={Clock3} label="Awaiting review" value={String(pendingCount)} delta={{ value: "+2", direction: "up", note: "this week" }} />
-        <StatCard glass icon={Check} label="Approved this month" value="41" delta={{ value: "+18%", direction: "up", note: "vs July" }} />
-        <StatCard glass icon={ShieldX} label="Rejected this month" value="6" delta={{ value: "-2", direction: "down", note: "vs July" }} />
+        <StatCard glass icon={Check} label="Approved this session" value={String(approvedCount)} />
+        <StatCard glass icon={ShieldX} label="Rejected this session" value={String(rejectedCount)} />
         <StatCard glass icon={Sparkles} label="Avg. review time" value="1.4 days" delta={{ value: "-0.6 days", direction: "up", note: "vs July" }} />
       </section>
 
