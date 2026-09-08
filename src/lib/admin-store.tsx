@@ -52,6 +52,8 @@ interface AdminStore {
   profiles: Record<string, DesignerProfile>;
   decisions: Record<string, ApprovalDecision>;
   tiers: PricingTier[];
+  issues: SupportIssue[];
+  addIssue: (issue: SupportIssue) => void;
   setUserStatus: (id: string, status: UserStatus) => void;
   toggleUserSuspension: (id: string) => UserStatus;
   setDesignerPlan: (id: string, plan: Plan) => void;
