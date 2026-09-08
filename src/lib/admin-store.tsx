@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import {
   users as seedUsers,
+  flaggedIssues,
   type AdminUser,
   type Plan,
   type UserStatus,
@@ -26,6 +27,19 @@ const seedTiers: PricingTier[] = [
   { id: "pro", name: "Pro", price: "180", features: "Unlimited orders, invoices, workshop chat", subs: 186 },
   { id: "atelier", name: "Atelier", price: "420", features: "Everything in Pro, team seats, showcase", subs: 41 },
 ];
+
+export interface SupportIssue {
+  id: string;
+  user: string;
+  subject: string;
+  severity: "high" | "medium" | "low";
+  opened: string;
+}
+
+const seedIssues: SupportIssue[] = flaggedIssues.map((i) => ({
+  ...i,
+  severity: i.severity as SupportIssue["severity"],
+}));
 
 export interface ApprovalDecision {
   status: ApprovalStatus;
