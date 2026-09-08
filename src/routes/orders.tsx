@@ -158,7 +158,24 @@ function OrdersPage() {
           </div>
         </div>
 
-        <OrderPanel order={selected} onClose={() => setSelectedId(null)} />
+        <OrderPanel
+          order={selected}
+          onClose={() => setSelectedId(null)}
+          escalated={selected ? escalated.includes(selected.id) : false}
+          onEscalate={(o) => {
+            addIssue({
+              id: `ESC-${o.id}`,
+              user: o.client,
+              subject: `Order ${o.id} stuck ${o.stuckDays} days — escalated from Orders`,
+              severity: o.stuckDays >= 7 ? "high" : "medium",
+              opened: "Just now",
+            });
+            setEscalated((prev) => (prev.includes(o.id) ? prev : [...prev, o.id]));
+            toast.success(`${o.id} escalated to Support.`, {
+              description: `Added to the issue queue as ${o.stuckDays >= 7 ? "high" : "medium"} severity.`,
+            });
+          }}
+        />
       </div>
     </AdminShell>
   );
