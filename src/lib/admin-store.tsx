@@ -184,6 +184,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       profiles,
       decisions,
       tiers,
+      issues,
+      addIssue,
       setUserStatus,
       toggleUserSuspension,
       setDesignerPlan,
@@ -191,7 +193,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       decideApplication,
       saveTiers,
     }),
-    [users, profiles, decisions, tiers, setUserStatus, toggleUserSuspension, setDesignerPlan, setDesignerNotes, decideApplication, saveTiers],
+    [users, profiles, decisions, tiers, issues, addIssue, setUserStatus, toggleUserSuspension, setDesignerPlan, setDesignerNotes, decideApplication, saveTiers],
   );
 
   return <AdminDataContext.Provider value={value}>{children}</AdminDataContext.Provider>;
