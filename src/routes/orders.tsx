@@ -210,7 +210,17 @@ function Stat({
   );
 }
 
-function OrderPanel({ order, onClose }: { order: Order | null; onClose: () => void }) {
+function OrderPanel({
+  order,
+  onClose,
+  escalated,
+  onEscalate,
+}: {
+  order: Order | null;
+  onClose: () => void;
+  escalated: boolean;
+  onEscalate: (order: Order) => void;
+}) {
   if (!order) {
     return (
       <aside className="glass-panel grid min-h-72 place-items-center p-8 text-center">
